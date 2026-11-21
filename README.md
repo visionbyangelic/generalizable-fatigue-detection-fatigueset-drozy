@@ -11,7 +11,7 @@ Consumer EEG headbands are cheap enough to put fatigue monitoring in trucks, fac
 ## Research questions
 
 - **RQ1, Generalisation.** How does performance change as the evaluation gets more honest: within a session, within a participant across sessions, and on completely unseen participants (leave-one-participant-out)?
-- **RQ2, Model comparison.** On identical, honest splits, does an EEGNet 1D-CNN trained on raw EEG beat a classical band-power + logistic-regression baseline?
+- **RQ2, Model comparison.** On identical, honest splits, does an EEGNet 1D-CNN trained on raw EEG plus two validity-indicator channels (whether each temporal channel, TP9 and TP10, passed the quality checks in that window) beat a classical band-power + logistic-regression baseline?
 - **RQ3, Multimodal extension.** Do heart-rate and electrodermal signals (recorded alongside the EEG) carry anything across participants where EEG alone does not?
 - **RQ4, Label diagnostics.** How much of the apparent performance in this literature is an artefact of how labels are assigned (for example, labelling whole sessions as "fatigued") rather than physiology?
 
@@ -36,10 +36,11 @@ Consumer EEG headbands are cheap enough to put fatigue monitoring in trucks, fac
 
 ## Method in brief
 
-- 4-second non-overlapping windows; band-power features (delta/theta/alpha/beta, log + relative power, frontal ratios) with a logistic-regression baseline; EEGNet 1D-CNN on raw EEG, compared on identical splits.
+- 4-second non-overlapping windows; band-power features (delta/theta/alpha/beta, log + relative power, frontal ratios) with a logistic-regression baseline; EEGNet 1D-CNN on raw EEG plus two validity-indicator channels (TP9 and TP10 quality, per window), compared on identical splits.
 - A pre-declared artefact rule (Amendment 1) keeps a window only if both frontal channels pass amplitude and flatline checks; channels that fail are masked per window and carried as validity indicators, never silently zeroed.
 - Every headline number ships with diagnostics: permutation nulls, a positive control (the pipeline must recover an injected effect of known size), a mask-only control (can recording quality alone predict the labels?), and a leakage-gap measurement (random split vs honest split).
 - Decision rules, including what may be claimed from each possible outcome, were written down and locked **before** results were interpreted: `docs/decision_table_lock.md`. The full build log, with the reason for every step, is in `track.md`.
+- This is retrospective offline classification: I filter each session as a complete recording (zero-phase filtering) and classify the windows afterwards, so the results do not speak to real-time or prospective detection.
 
 ## Results
 
